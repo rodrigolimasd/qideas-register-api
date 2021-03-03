@@ -40,8 +40,8 @@ public class UserControllerTest {
     private User getUser(){
         return User.builder()
                 .name("Teste")
-                .password("Password")
-                .email("Email")
+                .password("@Password")
+                .email("email@email.com")
                 .build();
     }
 

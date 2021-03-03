@@ -1,11 +1,13 @@
 package com.rodtech.qideasregisterapi.model;
 
+import com.rodtech.qideasregisterapi.annotations.ValidPassword;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 @Document(collection = "users")
@@ -18,9 +20,10 @@ public class User extends BaseModel {
     @NotEmpty
     private String name;
 
+    @Email
     @NotEmpty
     private String email;
 
-    @NotEmpty
+    @ValidPassword
     private String password;
 }
