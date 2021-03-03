@@ -1,8 +1,1 @@
-spring:
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: qideas_register_db
-      username: qideasregister
-      password: qideasregister
+

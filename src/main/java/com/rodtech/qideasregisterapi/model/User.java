@@ -14,6 +14,10 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User extends BaseModel {
+
+    @NotEmpty
+    private String name;
+
     @NotEmpty
     private String email;
 
