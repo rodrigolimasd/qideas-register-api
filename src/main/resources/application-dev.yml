@@ -6,3 +6,13 @@ spring:
       database: qideas_register_db
       username: qideasregister
       password: qideasregister
+
+security:
+  oauth2:
+    qideas:
+      access-token-uri: http://localhost:8091/oauth/token
+      client-id: register_service
+      client-secret: r3g!st3r_s3cre4
+    resource:
+      jwt:
+        keyValue: KeyTokenSingning
