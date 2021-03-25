@@ -9,12 +9,14 @@ import com.rodtech.qideasregisterapi.exception.RegisteredUsernameException;
 import com.rodtech.qideasregisterapi.model.Account;
 import com.rodtech.qideasregisterapi.repository.AccountRepository;
 import com.rodtech.qideasregisterapi.service.AccountService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.Optional;
 
+@Log4j2
 @Service
 public class AccountServiceImpl implements AccountService {
 
@@ -49,13 +51,18 @@ public class AccountServiceImpl implements AccountService {
                 .birthday(accountDTO.getBirthday())
                 .build();
 
+        log.info("validation account entity");
         saveAccountValidation(account);
-
-        authClient.create(UserAuthDTO.builder()
+        UserAuthDTO userAuthDTO = UserAuthDTO.builder()
                 .email(accountDTO.getEmail())
                 .username(accountDTO.getUsername())
                 .password(accountDTO.getPassword())
-                .build());
+                .build();
+
+        log.info("creating user {} ", userAuthDTO);
+        log.info("integration qideas-auth-api ");
+        authClient.create(userAuthDTO);
+        log.info("integrated qideas-auth-api success");
 
         account = accountRepository.save(account);
 
