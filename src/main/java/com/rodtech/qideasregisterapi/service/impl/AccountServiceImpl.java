@@ -1,6 +1,8 @@
 package com.rodtech.qideasregisterapi.service.impl;
 
+import com.rodtech.qideasregisterapi.client.AuthClient;
 import com.rodtech.qideasregisterapi.dto.AccountDTO;
+import com.rodtech.qideasregisterapi.dto.UserAuthDTO;
 import com.rodtech.qideasregisterapi.exception.RegisteredEmailException;
 import com.rodtech.qideasregisterapi.exception.AccountNotFoundException;
 import com.rodtech.qideasregisterapi.model.Account;
@@ -11,16 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@Transactional
 @Service
 public class AccountServiceImpl implements AccountService {
 
     private static final String EMAIL_REGISTERED = "E-mail already registered";
 
     private final AccountRepository accountRepository;
+    private final AuthClient authClient;
 
-    public AccountServiceImpl(AccountRepository accountRepository) {
+    public AccountServiceImpl(AccountRepository accountRepository, AuthClient authClient) {
         this.accountRepository = accountRepository;
+        this.authClient = authClient;
     }
 
     @Override
@@ -33,6 +36,7 @@ public class AccountServiceImpl implements AccountService {
         return findAccountByEmail(email).orElseThrow(() -> new AccountNotFoundException("Account not found"));
     }
 
+    @Transactional
     @Override
     public Account create(AccountDTO accountDTO) {
         Account account = Account.builder()
@@ -44,6 +48,12 @@ public class AccountServiceImpl implements AccountService {
         saveAccountValidation(account);
         account = accountRepository.save(account);
 
+        authClient.create(UserAuthDTO.builder()
+                .email(accountDTO.getEmail())
+                .username(accountDTO.getUsername())
+                .password(accountDTO.getPassword())
+                .build());
+
         return account;
     }
 
@@ -51,7 +61,8 @@ public class AccountServiceImpl implements AccountService {
     public Account update(AccountDTO account) {
         Account accountDb = findAccountById(account.getId());
         //TODO: more information to update
-        accountDb.setName(account.getEmail());
+        accountDb.setName(account.getName());
+        accountDb.setBirthday(account.getBirthday());
 
         saveAccountValidation(accountDb);
         accountRepository.save(accountDb);
