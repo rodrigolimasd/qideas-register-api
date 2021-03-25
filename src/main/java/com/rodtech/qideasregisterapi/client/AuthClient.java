@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(url = "http://localhost:8091/v1/users", name = "auth")
+@FeignClient(url = "http://localhost:8091/v1/users", name = "auth-client", configuration = FeignAuthClientConfig.class)
 public interface AuthClient {
 
     @PostMapping
