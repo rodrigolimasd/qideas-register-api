@@ -50,13 +50,14 @@ public class AccountServiceImpl implements AccountService {
                 .build();
 
         saveAccountValidation(account);
-        account = accountRepository.save(account);
 
         authClient.create(UserAuthDTO.builder()
                 .email(accountDTO.getEmail())
                 .username(accountDTO.getUsername())
                 .password(accountDTO.getPassword())
                 .build());
+
+        account = accountRepository.save(account);
 
         return account;
     }
