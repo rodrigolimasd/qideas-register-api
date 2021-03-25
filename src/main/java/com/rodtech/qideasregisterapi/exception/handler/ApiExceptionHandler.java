@@ -1,7 +1,7 @@
 package com.rodtech.qideasregisterapi.exception.handler;
 
 import com.rodtech.qideasregisterapi.exception.RegisteredEmailException;
-import com.rodtech.qideasregisterapi.exception.UserNotFoundException;
+import com.rodtech.qideasregisterapi.exception.AccountNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,9 +60,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-    @ExceptionHandler(UserNotFoundException.class)
-    protected ResponseEntity<Object> handleUserNotFoundException(
-            UserNotFoundException ex,
+    @ExceptionHandler(AccountNotFoundException.class)
+    protected ResponseEntity<Object> handleAccountNotFoundException(
+            AccountNotFoundException ex,
             WebRequest request) {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), Collections.emptyList());
         return new ResponseEntity<>(apiError, apiError.getStatus());

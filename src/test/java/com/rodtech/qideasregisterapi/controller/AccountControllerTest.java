@@ -1,7 +1,7 @@
 package com.rodtech.qideasregisterapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rodtech.qideasregisterapi.model.User;
+import com.rodtech.qideasregisterapi.model.Account;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest()
 @AutoConfigureMockMvc
 @ActiveProfiles("qa")
-public class UserControllerTest {
+public class AccountControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -26,21 +26,20 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     void shouldByCreateOneUser() {
-        User user = getUser();
+        Account account = getUser();
 
         this.mockMvc
                 .perform(post("/v1/users")
-                        .content(asJsonString(user))
+                        .content(asJsonString(account))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").exists());
     }
 
-    private User getUser(){
-        return User.builder()
+    private Account getUser(){
+        return Account.builder()
                 .name("Teste")
-                .password("@Password")
                 .email("email@email.com")
                 .build();
     }
