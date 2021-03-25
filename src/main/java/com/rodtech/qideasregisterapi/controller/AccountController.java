@@ -9,6 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/v1/accounts")
@@ -46,9 +47,9 @@ public class AccountController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id){
-        accountService.delete(id);
+    @DeleteMapping
+    public ResponseEntity<?> delete(Principal principal){
+        accountService.deleteAccount(principal);
         return ResponseEntity.noContent().build();
     }
 }

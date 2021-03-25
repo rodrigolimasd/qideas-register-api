@@ -5,18 +5,21 @@ import com.rodtech.qideasregisterapi.dto.AccountDTO;
 import com.rodtech.qideasregisterapi.dto.UserAuthDTO;
 import com.rodtech.qideasregisterapi.exception.RegisteredEmailException;
 import com.rodtech.qideasregisterapi.exception.AccountNotFoundException;
+import com.rodtech.qideasregisterapi.exception.RegisteredUsernameException;
 import com.rodtech.qideasregisterapi.model.Account;
 import com.rodtech.qideasregisterapi.repository.AccountRepository;
 import com.rodtech.qideasregisterapi.service.AccountService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService {
 
     private static final String EMAIL_REGISTERED = "E-mail already registered";
+    private static final String USERNAME_REGISTERED = "Username already registered";
 
     private final AccountRepository accountRepository;
     private final AuthClient authClient;
@@ -42,6 +45,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = Account.builder()
                 .email(accountDTO.getEmail())
                 .name(accountDTO.getName())
+                .username(accountDTO.getUsername())
                 .birthday(accountDTO.getBirthday())
                 .build();
 
@@ -70,8 +74,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void delete(String id){
-        Account account = findAccountById(id);
+    public void deleteAccount(Principal principal){
+        Account account = findByUserName(principal.getName());
+
+        authClient.delete(account.getEmail());
+
         accountRepository.delete(account);
     }
 
@@ -81,6 +88,11 @@ public class AccountServiceImpl implements AccountService {
                     if(account.getId()==null || !account.getId().equals(accountDb.getId()))
                         throw new RegisteredEmailException(EMAIL_REGISTERED);
                 });
+        findAccountByUserName(account.getUsername())
+                .ifPresent(accountDb -> {
+                    if(account.getId()==null || !account.getId().equals(accountDb.getId()))
+                        throw new RegisteredUsernameException(USERNAME_REGISTERED);
+                });
     }
 
     private Account findAccountById(String id){
@@ -88,7 +100,16 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
     }
 
+    private Account findByUserName(String userName){
+        return findAccountByUserName(userName)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+    }
+
     private Optional<Account> findAccountByEmail(String email){
         return accountRepository.findFirstByEmail(email);
+    }
+
+    private Optional<Account> findAccountByUserName(String userName){
+        return accountRepository.findFirstByUsername(userName);
     }
 }

@@ -25,4 +25,7 @@ public class Account extends BaseModel {
     @Email
     @NotEmpty
     private String email;
+
+    @NotEmpty
+    private String username;
 }
