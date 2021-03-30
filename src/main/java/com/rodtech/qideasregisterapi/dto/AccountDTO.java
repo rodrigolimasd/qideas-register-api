@@ -26,9 +26,6 @@ public class AccountDTO extends BaseModel {
     @NotEmpty
     private String email;
 
-    @NotEmpty
-    private String username;
-
     @ValidPassword
     private String password;
 }

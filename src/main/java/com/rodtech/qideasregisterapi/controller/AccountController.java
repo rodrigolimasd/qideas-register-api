@@ -1,6 +1,7 @@
 package com.rodtech.qideasregisterapi.controller;
 
 import com.rodtech.qideasregisterapi.dto.AccountDTO;
+import com.rodtech.qideasregisterapi.dto.AccountUpdateDTO;
 import com.rodtech.qideasregisterapi.model.Account;
 import com.rodtech.qideasregisterapi.service.AccountService;
 import lombok.extern.log4j.Log4j2;
@@ -22,19 +23,11 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable String id){
-        log.info("find account by id {} ", id);
-        Account result = accountService.findById(id);
-        log.info("account find {} ", result);
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/email/{email}")
-    public ResponseEntity<?> findByEmail(@PathVariable String email){
-        log.info("find account by email {} ", email);
-        Account result = accountService.findByEmail(email);
-        log.info("account find {} ", result);
+    @GetMapping("/info")
+    public ResponseEntity<?> accountInfo(Principal principal){
+        log.info("get info account {} ", principal);
+        Account result = accountService.findByEmail(principal.getName());
+        log.info("account info {} ", result);
         return ResponseEntity.ok(result);
     }
 
@@ -51,9 +44,9 @@ public class AccountController {
     }
 
     @PutMapping
-    public ResponseEntity<?> update(@RequestBody @Valid AccountDTO entity){
+    public ResponseEntity<?> update(@RequestBody @Valid AccountUpdateDTO entity, Principal principal){
         log.info("updating account {} ", entity);
-        accountService.update(entity);
+        accountService.update(entity, principal);
         log.info("account updated {} ", entity);
         return ResponseEntity.noContent().build();
     }
