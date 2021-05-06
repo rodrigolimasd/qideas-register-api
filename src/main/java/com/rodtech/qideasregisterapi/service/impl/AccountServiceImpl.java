@@ -2,17 +2,21 @@ package com.rodtech.qideasregisterapi.service.impl;
 
 import com.rodtech.qideasregisterapi.client.AuthClient;
 import com.rodtech.qideasregisterapi.dto.AccountDTO;
+import com.rodtech.qideasregisterapi.dto.AccountUpdateDTO;
 import com.rodtech.qideasregisterapi.dto.UserAuthDTO;
 import com.rodtech.qideasregisterapi.exception.RegisteredEmailException;
 import com.rodtech.qideasregisterapi.exception.AccountNotFoundException;
 import com.rodtech.qideasregisterapi.model.Account;
 import com.rodtech.qideasregisterapi.repository.AccountRepository;
 import com.rodtech.qideasregisterapi.service.AccountService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.Optional;
 
+@Log4j2
 @Service
 public class AccountServiceImpl implements AccountService {
 
@@ -24,11 +28,6 @@ public class AccountServiceImpl implements AccountService {
     public AccountServiceImpl(AccountRepository accountRepository, AuthClient authClient) {
         this.accountRepository = accountRepository;
         this.authClient = authClient;
-    }
-
-    @Override
-    public Account findById(String id) {
-        return findAccountById(id);
     }
 
     @Override
@@ -45,33 +44,41 @@ public class AccountServiceImpl implements AccountService {
                 .birthday(accountDTO.getBirthday())
                 .build();
 
+        log.info("validation account entity");
         saveAccountValidation(account);
-        account = accountRepository.save(account);
-
-        authClient.create(UserAuthDTO.builder()
+        UserAuthDTO userAuthDTO = UserAuthDTO.builder()
                 .email(accountDTO.getEmail())
-                .username(accountDTO.getUsername())
                 .password(accountDTO.getPassword())
-                .build());
+                .build();
+
+        log.info("creating user {} ", userAuthDTO);
+        log.info("integration qideas-auth-api ");
+        authClient.create(userAuthDTO);
+        log.info("integrated qideas-auth-api success");
+
+        account = accountRepository.save(account);
 
         return account;
     }
 
     @Override
-    public Account update(AccountDTO account) {
-        Account accountDb = findAccountById(account.getId());
+    public Account update(AccountUpdateDTO account, Principal principal) {
+        Account accountDb = findByEmail(principal.getName());
         //TODO: more information to update
         accountDb.setName(account.getName());
         accountDb.setBirthday(account.getBirthday());
 
-        saveAccountValidation(accountDb);
+        //saveAccountValidation(accountDb);
         accountRepository.save(accountDb);
         return null;
     }
 
     @Override
-    public void delete(String id){
-        Account account = findAccountById(id);
+    public void deleteAccount(Principal principal){
+        Account account = findByEmail(principal.getName());
+
+        authClient.delete(account.getEmail());
+
         accountRepository.delete(account);
     }
 
@@ -83,12 +90,8 @@ public class AccountServiceImpl implements AccountService {
                 });
     }
 
-    private Account findAccountById(String id){
-        return accountRepository.findById(id)
-                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
-    }
-
     private Optional<Account> findAccountByEmail(String email){
         return accountRepository.findFirstByEmail(email);
     }
+
 }

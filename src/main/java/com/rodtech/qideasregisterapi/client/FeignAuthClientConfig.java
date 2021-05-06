@@ -1,5 +1,6 @@
 package com.rodtech.qideasregisterapi.client;
 
+import feign.Logger;
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.security.OAuth2FeignRequestInterceptor;
@@ -32,6 +33,12 @@ public class FeignAuthClientConfig {
         details.setClientId(clientId);
         details.setClientSecret(clientSecret);
         return details;
+    }
+
+
+    @Bean
+    Logger.Level feignLoggerLevel() {
+        return Logger.Level.FULL;
     }
 
 
